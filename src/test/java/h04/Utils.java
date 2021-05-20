@@ -83,6 +83,18 @@ public class Utils {
         return Proxy.newProxyInstance(doubleToIntFunctionClass.getClassLoader(), new Class[] {doubleToIntFunctionClass}, handler);
     }
 
+    public static Object listToIntFunctionProxy() throws ReflectiveOperationException {
+        Class<?> listToIntFunctionClass = Class.forName("h04.function.ListToIntFunction");
+        InvocationHandler handler = (proxy, method, args) -> {
+            if (method.getName().equals("apply"))
+                return ((List<?>) args[0]).size();
+
+            throw new NoSuchMethodException(method.toString());
+        };
+
+        return Proxy.newProxyInstance(listToIntFunctionClass.getClassLoader(), new Class[] {listToIntFunctionClass}, handler);
+    }
+
     private static final Map<Class<?>, Boolean> CLASS_CORRECT_LOOKUP = new HashMap<>();
 
     public static boolean definitionCorrect(Class<?> c) {
