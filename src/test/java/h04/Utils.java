@@ -10,8 +10,10 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -67,6 +69,18 @@ public class Utils {
         } catch (ClassNotFoundException e) {
             throw new TestAbortedException("Class " + e.getMessage() + " not found", e);
         }
+    }
+
+    public static Object doubleToIntFunctionProxy() throws ReflectiveOperationException {
+        Class<?> doubleToIntFunctionClass = Class.forName("h04.function.DoubleToIntFunction");
+        InvocationHandler handler = (proxy, method, args) -> {
+            if (method.getName().equals("apply"))
+                return ((Number) args[0]).intValue();
+
+            throw new NoSuchMethodException(method.toString());
+        };
+
+        return Proxy.newProxyInstance(doubleToIntFunctionClass.getClassLoader(), new Class[] {doubleToIntFunctionClass}, handler);
     }
 
     private static final Map<Class<?>, Boolean> CLASS_CORRECT_LOOKUP = new HashMap<>();
