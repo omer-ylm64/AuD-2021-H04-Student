@@ -23,7 +23,7 @@ class MyCollectionsTest {
     public static Class<?> myCollectionsClass;
     public static Constructor<?> constructor;
     public static Field function, comparator;
-    public static Method sort;
+    public static Method sort, adaptiveMergeSortInPlace, selectionSortInPlace;
 
     private static Object instance;
     private static Object listToIntFunctionProxy, comparatorInstance;
@@ -32,6 +32,8 @@ class MyCollectionsTest {
     public static void checkClass() throws ReflectiveOperationException {
         assumeTrue(definitionCorrect(ListToIntFunctionTest.class),
                 "MyCollectionsTest requires ListToIntFunction to be implemented correctly");
+        assumeTrue(definitionCorrect(ListItemTest.class),
+                "MyCollectionsTest requires ListItem to be implemented correctly");
 
         myCollectionsClass = getClassForName("h04.collection.MyCollections");
 
@@ -78,13 +80,31 @@ class MyCollectionsTest {
         // methods
         try {
             sort = myCollectionsClass.getDeclaredMethod("sort", List.class);
-
-            assertTrue(isPublic(sort.getModifiers()));
-            assertEquals(void.class, sort.getReturnType());
-            assertEquals("java.util.List<T>", sort.getGenericParameterTypes()[0].getTypeName());
+            adaptiveMergeSortInPlace = myCollectionsClass.getDeclaredMethod("adaptiveMergeSortInPlace", ListItemTest.listItemClass, int.class);
+            selectionSortInPlace = myCollectionsClass.getDeclaredMethod("selectionSortInPlace", ListItemTest.listItemClass);
         } catch (NoSuchMethodException e) {
-            fail("MyCollections is missing a required method", e);
+            fail("MyCollections is missing a required method (some are implemented later)", e);
         }
+
+        assertTrue(isPublic(sort.getModifiers()), "sort(List) must be public");
+        assertEquals(void.class, sort.getReturnType(), "sort(List) must have return type void");
+        assertEquals("java.util.List<T>", sort.getGenericParameterTypes()[0].getTypeName(),
+                "First parameter of sort(List) is not correctly parameterized");
+
+        assertTrue(isPrivate(adaptiveMergeSortInPlace.getModifiers()), "adaptiveMergeSortInPlace(ListItem, int) must be private");
+        assertEquals("h04.collection.ListItem<T>", adaptiveMergeSortInPlace.getGenericReturnType().getTypeName(),
+                "adaptiveMergeSortInPlace(ListItem, int) must have return type ListItem");
+        assertEquals("h04.collection.ListItem<T>", adaptiveMergeSortInPlace.getGenericParameterTypes()[0].getTypeName(),
+                "First parameter of adaptiveMergeSortInPlace(ListItem, int) is not correctly parameterized");
+
+        assertTrue(isPrivate(selectionSortInPlace.getModifiers()), "selectionSortInPlace(ListItem) must be private");
+        assertEquals("h04.collection.ListItem<T>", selectionSortInPlace.getGenericReturnType().getTypeName(),
+                "selectionSortInPlace(ListItem) must have return type ListItem");
+        assertEquals("h04.collection.ListItem<T>", selectionSortInPlace.getGenericParameterTypes()[0].getTypeName(),
+                "First parameter of selectionSortInPlace(ListItem) is not correctly parameterized");
+
+        adaptiveMergeSortInPlace.setAccessible(true);
+        selectionSortInPlace.setAccessible(true);
 
 
         listToIntFunctionProxy = listToIntFunctionProxy();
@@ -100,15 +120,16 @@ class MyCollectionsTest {
 
     @ParameterizedTest
     @ArgumentsSource(RandomListProvider.class)
-    public void testValidArguments(List<Integer> sequence) throws ReflectiveOperationException {
+    public void testSort(List<Integer> sequence) throws ReflectiveOperationException {
         List<Integer> sequenceCopy = new ArrayList<>(sequence);
 
         sequenceCopy.sort(Comparator.naturalOrder());
+        sort.invoke(instance, sequence);
 
-        Iterator<?> correctSequence = sequenceCopy.iterator(), actualSequence = ((List<?>) sort.invoke(instance, sequence)).iterator();
+        Iterator<?> expectedSequence = sequenceCopy.iterator(), actualSequence = sequence.iterator();
         int i = 0;
 
-        while (correctSequence.hasNext())
-            assertEquals(correctSequence.next(), actualSequence.next(), "Sequences differ at index " + i++);
+        while (expectedSequence.hasNext())
+            assertEquals(expectedSequence.next(), actualSequence.next(), "Sequences differ at index " + i++);
     }
 }

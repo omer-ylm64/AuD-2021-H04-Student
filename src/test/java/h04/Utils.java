@@ -87,7 +87,7 @@ public class Utils {
         Class<?> listToIntFunctionClass = Class.forName("h04.function.ListToIntFunction");
         InvocationHandler handler = (proxy, method, args) -> {
             if (method.getName().equals("apply"))
-                return ((List<?>) args[0]).size();
+                return ((List<?>) args[0]).size() / 2;
 
             throw new NoSuchMethodException(method.toString());
         };
