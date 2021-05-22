@@ -69,7 +69,7 @@ public class ConstantListToIntFunctionTest {
     }
 
     @Test
-    public void testIntArray() throws ReflectiveOperationException {
+    public void testIntField() throws ReflectiveOperationException {
         assertEquals(42, intField.get(instance));
     }
 
