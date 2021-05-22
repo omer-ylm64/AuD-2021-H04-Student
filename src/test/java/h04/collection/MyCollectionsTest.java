@@ -168,7 +168,43 @@ class MyCollectionsTest {
             }
 
             return actualListItems.stream().anyMatch(actualListItem -> actualListItem == expectedListItem);
-        }), "At least one ListItem object has been added. ListItem objects returned by invocation of adaptiveMergeSortInPlace(ListItem) " +
+        }), "At least one ListItem object has been added. ListItem objects returned by invocation of adaptiveMergeSortInPlace(ListItem, int) " +
+                    "are not the same created by the provider");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(ListItemProvider.class)
+    public void testSelectionSortInPlace(List<Integer> list, Object unsortedListItem) throws Throwable {
+        int j = 0,
+            listItemSize = ListItemProvider.sizeOfListItem(unsortedListItem);
+
+        List<Object> listItems = new ArrayList<>(list.size());
+
+        ListItemProvider.listItems(listItems, unsortedListItem);
+
+        List<Integer> returnedSequence = new ArrayList<>(list.size());
+        Object sortedListItem = selectionSortInPlace.invoke(instance, unsortedListItem);
+
+        ListItemProvider.listFromListItems(returnedSequence, sortedListItem);
+        list.sort(Comparator.naturalOrder());
+
+        Iterator<Integer> expectedSequence = list.iterator(), actualSequence = returnedSequence.iterator();
+
+        while (expectedSequence.hasNext())
+            assertEquals(expectedSequence.next(), actualSequence.next(), "Sequences differ at index " + j++);
+
+        assertEquals(listItemSize, ListItemProvider.sizeOfListItem(sortedListItem), "Size of given ListItem and returned one don't match");
+        assertTrue(listItems.stream().allMatch(expectedListItem -> {
+            List<Object> actualListItems = new ArrayList<>(returnedSequence.size());
+
+            try {
+                ListItemProvider.listItems(actualListItems, sortedListItem);
+            } catch (ReflectiveOperationException e) {
+                e.printStackTrace();
+            }
+
+            return actualListItems.stream().anyMatch(actualListItem -> actualListItem == expectedListItem);
+        }), "At least one ListItem object has been added. ListItem objects returned by invocation of selectionSortInPlace(ListItem) " +
                     "are not the same created by the provider");
     }
 }
