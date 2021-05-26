@@ -1,4 +1,4 @@
-package h04;
+package h04.collection;
 
 public class ListItem<T> {
   /**
