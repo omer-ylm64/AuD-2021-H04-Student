@@ -32,12 +32,10 @@ public class ListItemTest {
         try {
             constructor = listItemClass.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
-            fail("ListItem may only have the default constructor (minimal implementation)", e);
+            fail("ListItem must have a parameterless constructor (minimal implementation)", e);
         }
 
         assertTrue(isPublic(constructor.getModifiers()), "Constructor of ListItem must be public");
-        assertEquals(1, listItemClass.getDeclaredConstructors().length,
-                "ListItem may only have the default constructor (minimal implementation)");
 
         // fields
         try {

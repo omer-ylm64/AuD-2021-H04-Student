@@ -24,7 +24,7 @@ public class RatioOfRunsProvider implements ArgumentsProvider {
                                                       Stream.of(0),
                                                       Utils.RANDOM.ints(1, 10)
                                                                   .distinct()
-                                                                  .limit(Utils.RANDOM.nextInt(10))
+                                                                  .limit(Utils.RANDOM.nextInt(9) + 1)
                                                                   .sorted()
                                                                   .boxed()))
                                               .collect(Collectors.toUnmodifiableList());
