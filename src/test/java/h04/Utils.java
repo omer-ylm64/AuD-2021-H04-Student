@@ -25,7 +25,7 @@ public class Utils {
     public static final Random RANDOM = new Random(SEED);
 
     private static final boolean CHECK_FOR_UPDATES = true;
-    private static final String TESTS_VERSION = "1.1";
+    private static final String TESTS_VERSION = "1.2";
 
     static {
         if (CHECK_FOR_UPDATES)
