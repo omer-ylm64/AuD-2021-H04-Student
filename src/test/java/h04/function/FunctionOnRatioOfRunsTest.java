@@ -94,7 +94,7 @@ public class FunctionOnRatioOfRunsTest {
         @ParameterizedTest
         @ArgumentsSource(RatioOfRunsProvider.class)
         public void testValidArguments(List<Integer> sequence, int numberOfRuns) throws ReflectiveOperationException {
-            assertEquals((int) ((double) numberOfRuns / sequence.size()), apply.invoke(instance, sequence));
+            assertEquals((int) (10.0E8 * numberOfRuns / sequence.size()), apply.invoke(instance, sequence));
         }
     }
 }

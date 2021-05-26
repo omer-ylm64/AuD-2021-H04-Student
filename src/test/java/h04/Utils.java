@@ -1,5 +1,6 @@
 package h04;
 
+import h04.function.DoubleToIntFunctionTest;
 import org.opentest4j.TestAbortedException;
 
 import java.io.IOException;
@@ -72,8 +73,8 @@ public class Utils {
     public static Object doubleToIntFunctionProxy() throws ReflectiveOperationException {
         Class<?> doubleToIntFunctionClass = Class.forName("h04.function.DoubleToIntFunction");
         InvocationHandler handler = (proxy, method, args) -> {
-            if (method.getName().equals("apply"))
-                return ((Number) args[0]).intValue();
+            if (method.equals(DoubleToIntFunctionTest.apply))
+                return (int) ((Double) args[0] * 10.0E8);
 
             throw new NoSuchMethodException(method.toString());
         };

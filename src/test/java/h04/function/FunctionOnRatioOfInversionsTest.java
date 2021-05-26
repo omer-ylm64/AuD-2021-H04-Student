@@ -94,7 +94,7 @@ public class FunctionOnRatioOfInversionsTest {
         @ParameterizedTest
         @ArgumentsSource(RatioOfInversionsProvider.class)
         public void testValidArguments(List<Integer> sequence, int numberOfInversions, int maxNumberOfInversions) throws ReflectiveOperationException {
-            assertEquals((int) ((double) numberOfInversions / maxNumberOfInversions), apply.invoke(instance, sequence));
+            assertEquals((int) (10.0E8 * numberOfInversions / maxNumberOfInversions), apply.invoke(instance, sequence));
         }
     }
 }
