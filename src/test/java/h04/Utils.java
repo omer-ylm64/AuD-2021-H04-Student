@@ -1,11 +1,9 @@
 package h04;
 
+import h04.function.DoubleToIntFunctionTest;
 import org.opentest4j.TestAbortedException;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,10 +25,11 @@ public class Utils {
     public static final Random RANDOM = new Random(SEED);
 
     private static final boolean CHECK_FOR_UPDATES = true;
+    private static final String TESTS_VERSION = "1.1";
 
     static {
         if (CHECK_FOR_UPDATES)
-            try (Reader reader = new FileReader(".test_version"); BufferedReader bufferedReader = new BufferedReader(reader)) {
+            try {
                 HttpClient client = HttpClient.newBuilder()
                                               .version(HttpClient.Version.HTTP_2)
                                               .followRedirects(HttpClient.Redirect.NORMAL)
@@ -39,18 +38,18 @@ public class Utils {
                 HttpRequest request = HttpRequest.newBuilder(URI.create("https://git.rwth-aachen.de/aud-tests/AuD-2021-H04-Student/-/raw/master/.test_version"))
                                                  .build();
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                String localVersionString = bufferedReader.readLine(), remoteVersionString = response.body();
+                String remoteVersionString = response.body();
 
                 if (response.statusCode() == 200) {
                     Integer[] remoteVersions = Arrays.stream(remoteVersionString.split("\\.", 2))
                                                      .map(Integer::parseInt)
                                                      .toArray(Integer[]::new),
-                              localVersions = Arrays.stream(localVersionString.split("\\.", 2))
+                              localVersions = Arrays.stream(TESTS_VERSION.split("\\.", 2))
                                                     .map(Integer::parseInt)
                                                     .toArray(Integer[]::new);
 
                     if (remoteVersions[0] > localVersions[0] || remoteVersions[1] > localVersions[1])
-                        System.out.println("Update available! Local version: " + localVersionString + " -- Remote version: " + remoteVersionString);
+                        System.out.println("Update available! Local version: " + TESTS_VERSION + " -- Remote version: " + remoteVersionString);
                     else
                         System.out.println("Local tests are up to date");
                 } else {
@@ -74,8 +73,8 @@ public class Utils {
     public static Object doubleToIntFunctionProxy() throws ReflectiveOperationException {
         Class<?> doubleToIntFunctionClass = Class.forName("h04.function.DoubleToIntFunction");
         InvocationHandler handler = (proxy, method, args) -> {
-            if (method.getName().equals("apply"))
-                return ((Number) args[0]).intValue();
+            if (method.equals(DoubleToIntFunctionTest.apply))
+                return (int) ((Double) args[0] * 10.0E8);
 
             throw new NoSuchMethodException(method.toString());
         };
